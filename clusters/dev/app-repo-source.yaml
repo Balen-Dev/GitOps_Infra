@@ -1,0 +1,40 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: gitops-apps
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  url: https://github.com/Balen-Dev/GitOps_Apps
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./apps/dev
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: gitops-apps
+  dependsOn:
+    - name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: apps-image-automation
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  path: ./apps/image-automation
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: gitops-apps
+  dependsOn:
+    - name: flux-system
